@@ -436,18 +436,16 @@ def new_group(*sprites):
     return Group(*sprites)
 
 def new_image(image=None, x=0, y=0, size=100, angle=0, transparency=100):
-    return Sprite(image=image, x=x, y=y, size=size, angle=angle, transparency=transparency)
+    return Image(image=image, x=x, y=y, size=size, angle=angle, transparency=transparency)
 
 
 class Sprite(object):
-    def __init__(self, image=None, x=0, y=0, size=100, angle=0, transparency=100):
-        self._image = image or _os.path.join(_os.path.split(__file__)[0], 'blank_image.png')
+    def __init__(self, x=0, y=0, size=100, angle=0, transparency=100):
         self._x = x
         self._y = y
         self._angle = angle
         self._size = size
         self._transparency = transparency
-
         self.physics = None
         self._is_clicked = False
         self._is_hidden = False
@@ -461,17 +459,7 @@ class Sprite(object):
 
 
     def _compute_primary_surface(self):
-        try:
-            self._primary_pygame_surface = pygame.image.load(_os.path.join(self._image))
-        except pygame.error as exc:
-            raise Oops(f"""We couldn't find the image file you provided named "{self._image}".
-If the file is in a folder, make sure you add the folder name, too.""") from exc
-        self._primary_pygame_surface.set_colorkey((255,255,255, 255)) # set background to transparent
-
-        self._should_recompute_primary_surface = False
-
-        # always recompute secondary surface if the primary surface changes
-        self._compute_secondary_surface(force=True)
+        pass
 
     def _compute_secondary_surface(self, force=False):
 
@@ -489,8 +477,8 @@ If the file is in a folder, make sure you add the folder name, too.""") from exc
                 self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
 
         # scale
-        if (self.size != 100) or force:
-            ratio = self.size/100.
+        if (self._size != 100) or force:
+            ratio = self._size/100.
             self._secondary_pygame_surface = pygame.transform.scale(
                 self._secondary_pygame_surface,
                 (round(self._secondary_pygame_surface.get_width() * ratio),    # width
@@ -564,14 +552,6 @@ You might want to look in your code where you're setting transparency and make s
         self._transparency = _clamp(alpha, 0, 100)
         self._should_recompute_secondary_surface = True
 
-    @property 
-    def image(self):
-        return self._image
-
-    @image.setter
-    def image(self, image_filename):
-        self._image = image_filename
-        self._should_recompute_primary_surface = True
 
     @property 
     def angle(self):
@@ -584,18 +564,6 @@ You might want to look in your code where you're setting transparency and make s
 
         if self.physics:
             self.physics._pymunk_body.angle = _math.radians(_angle)
-
-    @property 
-    def size(self):
-        return self._size
-
-    @size.setter
-    def size(self, percent):
-        self._size = percent
-        self._should_recompute_secondary_surface = True
-        if self.physics:
-            self.physics._remove()
-            self.physics._make_pymunk()
 
     def hide(self):
         self._is_hidden = True
@@ -675,7 +643,6 @@ You might want to look in your code where you're setting transparency and make s
 
         return _math.sqrt(dx**2 + dy**2)
 
-
     def remove(self):
         if self.physics:
             self.physics._remove()
@@ -739,7 +706,7 @@ You might want to look in your code where you're setting transparency and make s
 
     def _common_properties(self):
         # used with inheritance to clone
-        return {'x': self.x, 'y': self.y, 'size': self.size, 'transparency': self.transparency, 'angle': self.angle}
+        return {'x': self.x, 'y': self.y, 'size': self._size, 'transparency': self.transparency, 'angle': self.angle}
 
     def clone(self):
         # TODO: make work with physics
@@ -776,7 +743,75 @@ You might want to look in your code where you're setting transparency and make s
     def stop_physics(self):
         self.physics._remove()
         self.physics = None
-        
+
+
+class Image(Sprite):
+    def __init__(self, image=None, x=0, y=0, size=100, angle=0, transparency=100):
+        self._image = image or _os.path.join(_os.path.split(__file__)[0], 'blank_image.png')
+        self._x = x
+        self._y = y
+        self._angle = angle
+        self._size = size
+        self._transparency = transparency
+
+        self.physics = None
+        self._is_clicked = False
+        self._is_hidden = False
+
+
+        self._compute_primary_surface()
+
+        self._when_clicked_callbacks = []
+
+        all_sprites.append(self)
+
+    @property
+    def image(self):
+        return self._image
+
+    @image.setter
+    def image(self, image_filename):
+        self._image = image_filename
+        self._should_recompute_primary_surface = True
+
+    @property
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, percent):
+        self._size = percent
+        self._should_recompute_secondary_surface = True
+        if self.physics:
+            self.physics._remove()
+            self.physics._make_pymunk()
+
+        def _compute_primary_surface(self):
+            try:
+                self._primary_pygame_surface = pygame.image.load(_os.path.join(self._image))
+            except pygame.error as exc:
+                raise Oops(f"""We couldn't find the image file you provided named "{self._image}".
+    If the file is in a folder, make sure you add the folder name, too.""") from exc
+            self._primary_pygame_surface.set_colorkey((255, 255, 255, 255))  # set background to transparent
+
+            self._should_recompute_primary_surface = False
+
+            # always recompute secondary surface if the primary surface changes
+            self._compute_secondary_surface(force=True)
+
+    def _compute_primary_surface(self):
+        try:
+            self._primary_pygame_surface = pygame.image.load(_os.path.join(self._image))
+        except pygame.error as exc:
+            raise Oops(f"""We couldn't find the image file you provided named "{self._image}".
+If the file is in a folder, make sure you add the folder name, too.""") from exc
+        self._primary_pygame_surface.set_colorkey((255,255,255, 255)) # set background to transparent
+
+        self._should_recompute_primary_surface = False
+
+        # always recompute secondary surface if the primary surface changes
+        self._compute_secondary_surface(force=True)
+
 
 _SPEED_MULTIPLIER = 10
 class _Physics(object):
