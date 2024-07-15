@@ -169,7 +169,31 @@ line = play.new_line(
 
 This will create a thin line on the screen.
 
+### `play.new_sound()`
+```python
+cat_sound = play.new_sound("meow.mp3", 30)
+cat_sound.play()
+```
 
+This creates a new sound that you can play using `Sound.play()`
+Second parameter is volume, which is an integer value between 0 and 100, and by default is 100
+`Sound.set_volume` can be used to change the volume later on.
+
+
+### `start_music()`
+```python
+play.start_music("music.mp3", 30)
+```
+
+Starts playing music at the set volume (100 if not specified).
+Volume must be an integer between 0 and 100
+
+### `stop_music()`
+```python
+play.stop_music()
+```
+
+Stops any currently playing music
 
 #### `play.set_backdrop()`
 You can change the background color with the `play.set_backdrop()` command:

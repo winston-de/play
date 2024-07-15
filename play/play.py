@@ -307,6 +307,51 @@ class _MetaGroup(type):
             sprite.y += y_offset
 
 
+def new_sound(sound_file: str, volume: int = 100):
+    """Creates a new sound from the given file name
+    Supported file types are WAV, MP3, and OGG
+    The volume parameter is a percentage and should be between 0 and 100"""
+    return Sound(sound_file, volume)
+
+
+def start_music(music_file: str, volume: int = 100):
+    """Plays the given background music indefinitely
+    Supported file types are WAV, MP3, and OGG
+    The volume parameter is a percentage and should be between 0 and 100"""
+    if volume > 100 or volume < 0:
+        raise Exception("You are attempting to set the background music volume to an invalid value, "
+                        "please look at your code where you start playing music "
+                        "and verify you are setting it to an integer value between 0 and 100")
+
+    pygame.mixer.music.load(music_file)
+    pygame.mixer.music.set_volume(volume)
+    pygame.mixer_music.play(-1)
+
+
+def stop_music():
+    """Stops any currently playing background music"""
+    pygame.mixer_music.stop()
+
+
+class Sound:
+    """Defines a sound that can be made"""
+    def __init__(self, sound: str, volume):
+        self.sound = pygame.mixer.Sound(sound)
+        self.set_volume(volume)
+
+    def play(self):
+        self.sound.play()
+
+    def set_volume(self, volume: int):
+        """Sets the volume that the sound should play at, accepts an integer value between 0 and 100"""
+        if volume > 100 or volume < 0:
+            raise Exception("You are attempting to set the volume to an invalid value, "
+                            "please look at your code where you are creating or setting the sound volume and verify you"
+                            " are passing an integer value between 0 and 100")
+
+        self.sound.set_volume(volume/100)
+
+
 class Group(metaclass=_MetaGroup):
     """
     A way to group sprites together. A group can either be made like this:
@@ -1750,3 +1795,4 @@ def start_program():
     finally:
         _logging.getLogger("asyncio").setLevel(_logging.CRITICAL)
         pygame.quit()
+
