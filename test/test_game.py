@@ -25,7 +25,4 @@ def win_function():
     cat.words = 'You won!'
     cat_sound.play()
 
-
-img = play.new_image('test_image.jpg', 10,10, size=10)
-
 play.start_program()
