@@ -934,7 +934,8 @@ def _create_walls():
     _walls.append(_create_wall([screen.right, screen.bottom], [screen.right, screen.top])) # right
 _create_walls()
 def _remove_walls():
-    _physics_space.remove(_walls)
+    for wall in _walls:
+        _physics_space.remove(wall)
     _walls.clear()
 
 def new_box(color='black', x=0, y=0, width=100, height=200, border_color='light blue', border_width=0, angle=0, transparency=100, size=100):
