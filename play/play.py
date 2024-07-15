@@ -319,7 +319,7 @@ def start_music(music_file: str, volume: int = 100):
     Supported file types are WAV, MP3, and OGG
     The volume parameter is a percentage and should be between 0 and 100"""
     if volume > 100 or volume < 0:
-        raise Exception("You are attempting to set the background music volume to an invalid value, "
+        raise Oops("You are attempting to set the background music volume to an invalid value, "
                         "please look at your code where you start playing music "
                         "and verify you are setting it to an integer value between 0 and 100")
 
@@ -345,7 +345,7 @@ class Sound:
     def set_volume(self, volume: int):
         """Sets the volume that the sound should play at, accepts an integer value between 0 and 100"""
         if volume > 100 or volume < 0:
-            raise Exception("You are attempting to set the volume to an invalid value, "
+            raise Oops("You are attempting to set the volume to an invalid value, "
                             "please look at your code where you are creating or setting the sound volume and verify you"
                             " are passing an integer value between 0 and 100")
 
