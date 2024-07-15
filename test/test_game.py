@@ -4,6 +4,7 @@ cat = play.new_text('=^.^=', font_size=70)
 
 play.screen.width = 500
 play.screen.height = 500
+play.screen.title = "Meow!"
 
 cat_sound = play.new_sound("meow.mp3")
 

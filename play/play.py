@@ -45,6 +45,7 @@ class _screen(object):
     def __init__(self, width=800, height=600):
         self._width = width
         self._height = height
+        self._title = "Python Play"
 
     @property
     def width(self):
@@ -88,12 +89,20 @@ class _screen(object):
     def right(self):
         return self.width / 2
 
+    @property
+    def title(self):
+        return self._title
+
+    @title.setter
+    def title(self, _title):
+        self._title = _title
+        pygame.display.set_caption(_title)
+
 
 screen = _screen()
 
 # _pygame_display = pygame.display.set_mode((screen_width, screen_height), pygame.DOUBLEBUF | pygame.OPENGL)
 _pygame_display = pygame.display.set_mode((screen.width, screen.height), pygame.DOUBLEBUF)
-pygame.display.set_caption("Python Play")
 
 
 class _mouse(object):

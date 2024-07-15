@@ -685,6 +685,7 @@ The way to get information about the screen. `play.screen` has these properties:
 - `play.screen.right` - The `x` coordinate for the right edge of the screen.
 - `play.screen.top` - The `y` coordinate for the top of the screen.
 - `play.screen.bottom` - The `y` coordinate for the bottom of the screen.
+- `play.screen.title` - Sets the title of the window
 
 
 #### `play.all_sprites`
