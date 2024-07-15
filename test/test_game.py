@@ -2,9 +2,11 @@ import play.play
 
 cat = play.new_text('=^.^=', font_size=70)
 
-play.screen.width = 500
-play.screen.height = 500
+play.screen.width = 820
+play.screen.height = 815
 play.screen.title = "Meow!"
+play.screen.show_grid = True
+play.set_backdrop("blue")
 
 cat_sound = play.new_sound("meow.mp3")
 

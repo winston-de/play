@@ -46,6 +46,7 @@ class _screen(object):
         self._width = width
         self._height = height
         self._title = "Python Play"
+        self.show_grid = False
 
     @property
     def width(self):
@@ -1661,7 +1662,7 @@ _keys_to_skip = (pygame.K_MODE,)
 pygame.event.set_allowed(
     [pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP, pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP, pygame.MOUSEMOTION])
 _clock = pygame.time.Clock()
-
+_grid_font = pygame.font.SysFont("arial", 10)
 
 def _game_loop():
     _keys_pressed_this_frame.clear()  # do this instead of `_keys_pressed_this_frame = []` to save a tiny bit of memory
@@ -1758,6 +1759,38 @@ def _game_loop():
     #       does not support fill() on OpenGL surfaces
     # gl.glClearColor(_background_color[0], _background_color[1], _background_color[2], 1)
     # gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+
+    if screen.show_grid:
+        # vertical lines
+        xo = (screen.width % 50) // 2  # x offset
+        yo = (screen.height % 50) // 2  # y offset
+
+        for i in range(0, screen.height, 50):
+            if i > 0:
+                txt = _grid_font.render(str(i - screen.height // 2 + yo), True, "black")
+                _pygame_display.blit(txt, (5 + xo, i-12 + yo))
+
+            pygame.draw.line(_pygame_display, (0, 0, 0),
+                             (-50, i+yo), (screen.width + 50, i + yo), 1)
+
+        # horizontal lines
+        for i in range(0, screen.width, 50):
+            if 0 < i < screen.width - 20:
+                txt = _grid_font.render(str(i - screen.width // 2 + xo), True, "black")
+                _pygame_display.blit(txt, (i+4 + xo, 5 + yo))
+
+            pygame.draw.line(_pygame_display, (0, 0, 0),
+                             (i + xo, -50), (i + xo, screen.height + 50), 1)
+
+        pygame.draw.circle(_pygame_display, "black", (screen.width/2, screen.height/2), radius=4)
+        center = _grid_font.render("(0, 0)", True, "black")
+        _pygame_display.blit(center, (screen.width/2 + 4, screen.height/2 - 12))
+
+        cursor_pos = pygame.mouse.get_pos()
+        mouse_txt = _grid_font.render(f"({cursor_pos[0]}, {cursor_pos[1]})", True, "black")
+        pygame.draw.rect(_pygame_display, "white", (cursor_pos[0] + 2, cursor_pos[1] - 12,
+                         mouse_txt.get_width() + 4, mouse_txt.get_height() + 2), 0, 4)
+        _pygame_display.blit(mouse_txt, (cursor_pos[0] + 4, cursor_pos[1] - 12))
 
     for sprite in all_sprites:
 
