@@ -438,6 +438,7 @@ def new_group(*sprites):
 def new_image(image=None, x=0, y=0, size=100, angle=0, transparency=100):
     return Sprite(image=image, x=x, y=y, size=size, angle=angle, transparency=transparency)
 
+
 class Sprite(object):
     def __init__(self, image=None, x=0, y=0, size=100, angle=0, transparency=100):
         self._image = image or _os.path.join(_os.path.split(__file__)[0], 'blank_image.png')
@@ -775,6 +776,7 @@ You might want to look in your code where you're setting transparency and make s
     def stop_physics(self):
         self.physics._remove()
         self.physics = None
+        
 
 _SPEED_MULTIPLIER = 10
 class _Physics(object):
@@ -984,10 +986,10 @@ def _remove_walls():
     _walls.clear()
 
 def new_box(color='black', x=0, y=0, width=100, height=200, border_color='light blue', border_width=0, angle=0, transparency=100, size=100):
-    return Box(color=color, x=x, y=y, width=width, height=height, border_color=border_color, border_width=border_width, angle=angle, transparency=transparency, size=size)
+    return Box(color=color, x=x, y=y, width=width, height=height, border_color=border_color, border_width=border_width, angle=angle, transparency=transparency)
 
 class Box(Sprite):
-    def __init__(self, color='black', x=0, y=0, width=100, height=200, border_color='light blue', border_width=0, transparency=100, size=100, angle=0):
+    def __init__(self, color='black', x=0, y=0, width=100, height=200, border_color='light blue', border_width=0, transparency=100, angle=0):
         self._x = x
         self._y = y
         self._width = width
@@ -995,9 +997,8 @@ class Box(Sprite):
         self._color = color
         self._border_color = border_color
         self._border_width = border_width
-
+        self._size = 100
         self._transparency = transparency
-        self._size = size
         self._angle = angle
         self._is_clicked = False
         self._is_hidden = False
@@ -1083,10 +1084,10 @@ class Box(Sprite):
 
 def new_circle(color='black', x=0, y=0, radius=100, border_color='light blue', border_width=0, transparency=100, size=100, angle=0):
     return Circle(color=color, x=x, y=y, radius=radius, border_color=border_color, border_width=border_width,
-        transparency=transparency, size=size, angle=angle)
+        transparency=transparency, angle=angle)
 
 class Circle(Sprite):
-    def __init__(self, color='black', x=0, y=0, radius=100, border_color='light blue', border_width=0, transparency=100, size=100, angle=0):
+    def __init__(self, color='black', x=0, y=0, radius=100, border_color='light blue', border_width=0, transparency=100, angle=0):
         self._x = x
         self._y = y
         self._color = color
@@ -1095,7 +1096,7 @@ class Circle(Sprite):
         self._border_width = border_width
 
         self._transparency = transparency
-        self._size = size
+        self._size = 100
         self._angle = angle
         self._is_clicked = False
         self._is_hidden = False
@@ -1171,10 +1172,10 @@ class Circle(Sprite):
         self._should_recompute_primary_surface = True
 
 def new_line(color='black', x=0, y=0, length=None, angle=None, thickness=1, x1=None, y1=None, transparency=100, size=100):
-    return line(color=color, x=x, y=y, length=length, angle=angle, thickness=thickness, x1=x1, y1=y1, transparency=transparency, size=size)
+    return line(color=color, x=x, y=y, length=length, angle=angle, thickness=thickness, x1=x1, y1=y1, transparency=transparency)
 
 class line(Sprite):
-    def __init__(self, color='black', x=0, y=0, length=None, angle=None, thickness=1, x1=None, y1=None, transparency=100, size=100):
+    def __init__(self, color='black', x=0, y=0, length=None, angle=None, thickness=1, x1=None, y1=None, transparency=100):
         self._x = x
         self._y = y
         self._color = color
@@ -1196,7 +1197,7 @@ class line(Sprite):
             self._x1, self._y1 = self._calc_endpoint()
 
         self._transparency = transparency
-        self._size = size
+        self._size = 100
         self._is_hidden = False
         self._is_clicked = False
         self.physics = None
@@ -1317,17 +1318,17 @@ class line(Sprite):
         self._should_recompute_primary_surface = True
 
 def new_text(words='hi :)', x=0, y=0, font=None, font_size=50, color='black', angle=0, transparency=100, size=100):
-    return text(words=words, x=x, y=y, font=font, font_size=font_size, color=color, angle=angle, transparency=transparency, size=size)
+    return text(words=words, x=x, y=y, font=font, font_size=font_size, color=color, angle=angle, transparency=transparency)
 
 class text(Sprite):
-    def __init__(self, words='hi :)', x=0, y=0, font=None, font_size=50, color='black', angle=0, transparency=100, size=100):
+    def __init__(self, words='hi :)', x=0, y=0, font=None, font_size=50, color='black', angle=0, transparency=100):
         self._words = words
         self._x = x
         self._y = y
         self._font = font
         self._font_size = font_size
         self._color = color
-        self._size = size
+        self._size = 100
         self._angle = angle
         self.transparency = transparency
 
