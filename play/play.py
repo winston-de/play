@@ -1020,7 +1020,7 @@ def _remove_walls():
         _physics_space.remove(wall)
     _walls.clear()
 
-def new_box(color='black', x=0, y=0, width=100, height=200, border_color='light blue', border_width=0, angle=0, transparency=100, size=100):
+def new_box(color='black', x=0, y=0, width=100, height=200, border_color='light blue', border_width=0, angle=0, transparency=100):
     return Box(color=color, x=x, y=y, width=width, height=height, border_color=border_color, border_width=border_width, angle=angle, transparency=transparency)
 
 class Box(Sprite):
@@ -1117,7 +1117,7 @@ class Box(Sprite):
     def clone(self):
         return self.__class__(color=self.color, width=self.width, height=self.height, border_color=self.border_color, border_width=self.border_width, **self._common_properties())
 
-def new_circle(color='black', x=0, y=0, radius=100, border_color='light blue', border_width=0, transparency=100, size=100, angle=0):
+def new_circle(color='black', x=0, y=0, radius=100, border_color='light blue', border_width=0, transparency=100, angle=0):
     return Circle(color=color, x=x, y=y, radius=radius, border_color=border_color, border_width=border_width,
         transparency=transparency, angle=angle)
 
@@ -1206,7 +1206,7 @@ class Circle(Sprite):
         self._border_width = _border_width
         self._should_recompute_primary_surface = True
 
-def new_line(color='black', x=0, y=0, length=None, angle=None, thickness=1, x1=None, y1=None, transparency=100, size=100):
+def new_line(color='black', x=0, y=0, length=None, angle=None, thickness=1, x1=None, y1=None, transparency=100):
     return line(color=color, x=x, y=y, length=length, angle=angle, thickness=thickness, x1=x1, y1=y1, transparency=transparency)
 
 class line(Sprite):
@@ -1352,7 +1352,7 @@ class line(Sprite):
         self._length, self._angle = self._calc_length_angle()
         self._should_recompute_primary_surface = True
 
-def new_text(words='hi :)', x=0, y=0, font=None, font_size=50, color='black', angle=0, transparency=100, size=100):
+def new_text(words='hi :)', x=0, y=0, font=None, font_size=50, color='black', angle=0, transparency=100):
     return text(words=words, x=x, y=y, font=font, font_size=font_size, color=color, angle=angle, transparency=transparency)
 
 class text(Sprite):
