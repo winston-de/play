@@ -1782,15 +1782,22 @@ def _game_loop():
             pygame.draw.line(_pygame_display, (0, 0, 0),
                              (i + xo, -50), (i + xo, screen.height + 50), 1)
 
+        # axis labels
+        txtx = _grid_font.render("x", True, "black")
+        _pygame_display.blit(txtx, (xo + 40, yo + 5))
+        txty = _grid_font.render("y", True, "black")
+        _pygame_display.blit(txty, (xo + 5, yo + 20))
+
+        # red center lines
+        pygame.draw.line(_pygame_display, "red",
+                         (0, screen.height//2), (screen.width, screen.height//2), 1)
+        pygame.draw.line(_pygame_display, "red",
+                         (screen.width//2, 0), (screen.width//2, screen.height), 1)
+
+        # axis
         pygame.draw.circle(_pygame_display, "black", (screen.width/2, screen.height/2), radius=4)
         center = _grid_font.render("(0, 0)", True, "black")
         _pygame_display.blit(center, (screen.width/2 + 4, screen.height/2 - 12))
-
-        cursor_pos = pygame.mouse.get_pos()
-        mouse_txt = _grid_font.render(f"({cursor_pos[0]}, {cursor_pos[1]})", True, "black")
-        pygame.draw.rect(_pygame_display, "white", (cursor_pos[0] + 2, cursor_pos[1] - 12,
-                         mouse_txt.get_width() + 4, mouse_txt.get_height() + 2), 0, 4)
-        _pygame_display.blit(mouse_txt, (cursor_pos[0] + 4, cursor_pos[1] - 12))
 
     for sprite in all_sprites:
 
@@ -1861,6 +1868,14 @@ def _game_loop():
                 pygame.draw.line(_pygame_display, _color_name_to_rgb(sprite.color), (x, y), (x1, y1), sprite.thickness)
         else:
             _pygame_display.blit(sprite._secondary_pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
+
+    if screen.show_grid:
+        # draw coordinates next to mouse cursor
+        cursor_pos = pygame.mouse.get_pos()
+        mouse_txt = _grid_font.render(f"({cursor_pos[0]}, {cursor_pos[1]})", True, "black")
+        pygame.draw.rect(_pygame_display, "white", (cursor_pos[0] + 2, cursor_pos[1] - 12,
+                         mouse_txt.get_width() + 4, mouse_txt.get_height() + 2), 0, 4)
+        _pygame_display.blit(mouse_txt, (cursor_pos[0] + 4, cursor_pos[1] - 12))
 
     pygame.display.flip()
     _loop.call_soon(_game_loop)

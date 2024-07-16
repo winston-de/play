@@ -1,5 +1,6 @@
 import play
 
+play.screen.show_grid = False
 sprite = play.new_circle(color='gray', radius=20)
 sprite.start_physics(obeys_gravity=True, bounciness=0,stable=True, friction=0)
 

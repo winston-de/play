@@ -687,8 +687,6 @@ The way to get information about the screen. `play.screen` has these properties:
 - `play.screen.bottom` - The `y` coordinate for the bottom of the screen.
 - `play.screen.title` - Sets the title of the window
 - `play.screen.show_grid` - When set to True, shows a labeled grid, as well as mouse coordinates next to the cursor.
-For best results, your screen size should be a multiple of two
-
 
 #### `play.all_sprites`
 
