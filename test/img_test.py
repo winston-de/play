@@ -12,8 +12,8 @@ img3 = img2.clone()
 img3.x = 150
 img3.y = 150
 
-circle = play.new_circle()
-c2 = circle.clone()
+# circle = play.new_circle()
+# c2 = circle.clone()
 
 
 play.start_program()

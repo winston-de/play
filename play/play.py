@@ -1570,7 +1570,7 @@ def when_any_message_received(func):
     return wrapper
 
 
-def send_message(name: str):
+def broadcast_message(name: str):
     """Sends a message to every function listening for a message with the given name"""
     val = _message_callbacks.get(name)
     if val is None:

@@ -27,7 +27,7 @@ def win_function():
     cat.show()
     cat.words = 'You won!'
     cat_sound.play()
-    play.send_message("hi")
+    play.broadcast_message("hi")
 
 
 @play.when_messaged_received("hi")

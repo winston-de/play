@@ -263,9 +263,10 @@ def message(name):
 
 Used to make a function listen for any message, the name of the message is passed to the function when one is received.
 
-#### `play.send_message()`
+#### `play.broadcast_message()`
+
 ```python
-play.send_message("hi")
+play.broadcast_message("hi")
 ```
 Sends the given message to any function listening for that message (or all messages) will receive it.
 
