@@ -10,6 +10,7 @@ rect.start_physics(obeys_gravity=True, stable=False)
 img = play.new_image('test_image.jpg', 10,10, size=10)
 img.start_physics(obeys_gravity=True, stable=False)
 
+
 play.new_text()
 
 play.start_program()

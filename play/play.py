@@ -1535,6 +1535,48 @@ def when_sprite_clicked(*sprites):
     return wrapper
 
 
+_message_callbacks = {}  # name: list of callbacks
+_all_message_callbacks = []
+
+# @decorator
+def when_messaged_received(name: str):
+    """Makes a function listen for the given message"""
+    def decorator(func):
+        async_callback = _make_async(func)
+        val = _message_callbacks.get(name)
+        if val is None:
+            _message_callbacks[name] = [async_callback]
+        else:
+            val.append(async_callback)
+        return async_callback
+    return decorator
+
+
+def when_any_message_received(func):
+    """Called when any message is received, passes the message as a parameter"""
+    async_callback = _make_async(func)
+    async def wrapper(message):
+        wrapper.is_running = True
+        await async_callback(message)
+        wrapper.is_running = False
+
+    _all_message_callbacks.append(wrapper)
+    return wrapper
+
+
+def send_message(name: str):
+    """Sends a message to every function listening for a message with the given name"""
+    val = _message_callbacks.get(name)
+    if val is None:
+        raise Oops("Unable to send message, no function has been registered to receive the message")
+
+    for func in val:
+        _loop.create_task(func())
+
+    for func in _all_message_callbacks:
+        _loop.create_task(func(name))
+
+
 pygame.key.set_repeat(200, 16)
 _pressed_keys = {}
 _keypress_callbacks = []
@@ -1545,11 +1587,10 @@ _keyrelease_callbacks = []
 def when_any_key_pressed(func):
     if not callable(func):
         raise Oops("""@play.when_any_key_pressed doesn't use a list of keys. Try just this instead:
-
-@play.when_any_key_pressed
-async def do(key):
-    print("This key was pressed!", key)
-""")
+            @play.when_any_key_pressed
+            async def do(key):
+                print("This key was pressed!", key)
+            """)
     async_callback = _make_async(func)
 
     async def wrapper(*args, **kwargs):

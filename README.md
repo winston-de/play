@@ -246,6 +246,29 @@ def do():
 This will make the cat turn upside down instantly when the program starts.
 
 
+#### `@play.when_messaged_received()`
+```python
+@play.when_messaged_received("hi")
+def test():
+    print("Got it!")
+```
+Used to make a function listen for a given message. When the message is received, the function will be called.
+
+#### `@play.when_any_messaged_received()`
+```python
+@play.when_any_message_received
+def message(name):
+    print(name)
+```
+
+Used to make a function listen for any message, the name of the message is passed to the function when one is received.
+
+#### `play.send_message()`
+```python
+play.send_message("hi")
+```
+Sends the given message to any function listening for that message (or all messages) will receive it.
+
 #### `await play.timer(seconds=1)`
 
 To run code after a waiting period, you can use the `await play.timer()` command like this:
