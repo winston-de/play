@@ -758,11 +758,11 @@ You might want to look in your code where you're setting transparency and make s
 
     def _common_properties(self):
         # used with inheritance to clone
-        return {'x': self.x, 'y': self.y, 'size': self._size, 'transparency': self.transparency, 'angle': self.angle}
+        return {'x': self.x, 'y': self.y, 'transparency': self.transparency, 'angle': self.angle}
 
     def clone(self):
         # TODO: make work with physics
-        return self.__class__(image=self.image, **self._common_properties())
+        return self.__class__(**self._common_properties())
 
     # def __getattr__(self, key):
     #     # TODO: use physics as a proxy object so users can do e.g. sprite.x_speed
@@ -862,6 +862,10 @@ If the file is in a folder, make sure you add the folder name, too.""") from exc
 
         # always recompute secondary surface if the primary surface changes
         self._compute_secondary_surface(force=True)
+
+
+    def clone(self):
+        return self.__class__(image_filename=self.image, size=self.size, **self._common_properties())
 
 
 _SPEED_MULTIPLIER = 10
@@ -1538,6 +1542,7 @@ def when_sprite_clicked(*sprites):
 _message_callbacks = {}  # name: list of callbacks
 _all_message_callbacks = []
 
+
 # @decorator
 def when_messaged_received(name: str):
     """Makes a function listen for the given message"""
@@ -1555,6 +1560,7 @@ def when_messaged_received(name: str):
 def when_any_message_received(func):
     """Called when any message is received, passes the message as a parameter"""
     async_callback = _make_async(func)
+
     async def wrapper(message):
         wrapper.is_running = True
         await async_callback(message)
