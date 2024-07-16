@@ -817,11 +817,11 @@ class Image(Sprite):
         all_sprites.append(self)
 
     @property
-    def image(self):
+    def image_filename(self):
         return self._image
 
-    @image.setter
-    def image(self, image_filename):
+    @image_filename.setter
+    def image_filename(self, image_filename):
         self._image = image_filename
         self._should_recompute_primary_surface = True
 
@@ -865,7 +865,7 @@ If the file is in a folder, make sure you add the folder name, too.""") from exc
 
 
     def clone(self):
-        return self.__class__(image_filename=self.image, size=self.size, **self._common_properties())
+        return self.__class__(image_filename=self.image_filename, size=self.size, **self._common_properties())
 
 
 _SPEED_MULTIPLIER = 10
