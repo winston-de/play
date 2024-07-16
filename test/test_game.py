@@ -38,5 +38,9 @@ def test():
 def message(name):
     print(name)
 
+@play.when_key_pressed("g")
+def toggle(key):
+    play.screen.show_grid = not play.screen.show_grid
+
 
 play.start_program()

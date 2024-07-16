@@ -712,6 +712,13 @@ The way to get information about the screen. `play.screen` has these properties:
 - `play.screen.title` - Sets the title of the window
 - `play.screen.show_grid` - When set to True, shows a labeled grid, as well as mouse coordinates next to the cursor.
 
+The grid can be turned on and off at any point while the program is running, allowing you to bind it to a key press
+```python
+@play.when_key_pressed("g")
+def toggle(key):
+    play.screen.show_grid = not play.screen.show_grid
+```
+
 #### `play.all_sprites`
 
 A list of all the sprites (images, shapes, text) in the program.
