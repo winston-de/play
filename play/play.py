@@ -1872,7 +1872,7 @@ def _game_loop():
     if screen.show_grid:
         # draw coordinates next to mouse cursor
         cursor_pos = pygame.mouse.get_pos()
-        mouse_txt = _grid_font.render(f"({cursor_pos[0]}, {cursor_pos[1]})", True, "black")
+        mouse_txt = _grid_font.render(f"({cursor_pos[0] - screen.width // 2}, {cursor_pos[1] - screen.height // 2})", True, "black")
         pygame.draw.rect(_pygame_display, "white", (cursor_pos[0] + 2, cursor_pos[1] - 12,
                          mouse_txt.get_width() + 4, mouse_txt.get_height() + 2), 0, 4)
         _pygame_display.blit(mouse_txt, (cursor_pos[0] + 4, cursor_pos[1] - 12))
