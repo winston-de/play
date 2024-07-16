@@ -1,5 +1,6 @@
 import os as _os
 import logging as _logging
+import time
 import warnings as _warnings
 import inspect as _inspect
 
@@ -485,8 +486,19 @@ def new_group(*sprites):
     return Group(*sprites)
 
 
-def new_image(image_filename=None, x=0, y=0, size=100, angle=0, transparency=100):
-    return Image(image_filename=image_filename, x=x, y=y, size=size, angle=angle, transparency=transparency)
+_say_font = pygame.font.SysFont("arial", 14)
+
+
+class _Say:
+    def __init__(self, words, stop_time):
+        self.words = words
+        self.rendered = _say_font.render(words, True, "black")
+        self.stop_time = stop_time
+
+
+# we store speech bubbles like this instead of within the Sprite class in order to keep the _Say instance internal to
+# the library. If stored as a field it would be accessible to the consumer
+_say_queue = {} # Sprite : _Say
 
 
 class Sprite(object):
@@ -500,6 +512,7 @@ class Sprite(object):
         self._is_clicked = False
         self._is_hidden = False
 
+        self._primary_pygame_surface = None
         self._compute_primary_surface()
 
         self._when_clicked_callbacks = []
@@ -550,6 +563,9 @@ class Sprite(object):
 
     def turn(self, degrees=10):
         self.angle += degrees
+
+    def say(self, words, seconds=3):
+        _say_queue[self] = _Say(words, time.time() + seconds)
 
     @property
     def x(self):
@@ -795,6 +811,10 @@ You might want to look in your code where you're setting transparency and make s
     def stop_physics(self):
         self.physics._remove()
         self.physics = None
+
+
+def new_image(image_filename=None, x=0, y=0, size=100, angle=0, transparency=100):
+    return Image(image_filename=image_filename, x=x, y=y, size=size, angle=angle, transparency=transparency)
 
 
 class Image(Sprite):
@@ -1814,7 +1834,7 @@ def _game_loop():
 
         for i in range(0, screen.height, 50):
             if i > 0:
-                txt = _grid_font.render(str(i - screen.height // 2 + yo), True, "black")
+                txt = _grid_font.render(str(-1*(i - screen.height // 2 + yo)), True, "black")
                 _pygame_display.blit(txt, (5 + xo, i-12 + yo))
 
             pygame.draw.line(_pygame_display, (0, 0, 0),
@@ -1913,15 +1933,43 @@ def _game_loop():
                 pygame.draw.aaline(_pygame_display, _color_name_to_rgb(sprite.color), (x, y), (x1, y1), True)
             else:
                 pygame.draw.line(_pygame_display, _color_name_to_rgb(sprite.color), (x, y), (x1, y1), sprite.thickness)
+
         else:
             _pygame_display.blit(sprite._secondary_pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
+
+        # draw speech bubbles
+        sq = _say_queue.get(sprite)
+        if sq is not None:
+            if time.time() >= sq.stop_time:
+                _say_queue.pop(sprite)
+            else:
+                ren = sq.rendered
+                x = sprite.right + screen.width / 2 + 5
+                y = screen.height / 2 - sprite.top - 10
+
+                # if the sprite is displaying above the top of the screen, move it to the bottom
+                if y < 10:
+                    y += sprite.height + 20
+
+                if x > _pygame_display.get_width() - 10:
+                    x -= sprite.width + 10 + ren.get_width()
+
+                pygame.draw.rect(_pygame_display, (12, 12, 12),
+                                 (x - 6, y - 6, ren.get_width() + 7, ren.get_height() + 7), border_radius=2)
+                pygame.draw.rect(_pygame_display, (255, 255, 255), (x-5, y-5, ren.get_width() + 5,
+                                                                    ren.get_height() + 5), border_radius=2)
+                _pygame_display.blit(ren, (x-2, y-2))
+
 
     if screen.show_grid:
         # draw coordinates next to mouse cursor
         cursor_pos = pygame.mouse.get_pos()
         mouse_txt = _grid_font.render(f"({cursor_pos[0] - screen.width // 2}, {cursor_pos[1] - screen.height // 2})", True, "black")
-        pygame.draw.rect(_pygame_display, "white", (cursor_pos[0] + 2, cursor_pos[1] - 12,
-                         mouse_txt.get_width() + 4, mouse_txt.get_height() + 2), 0, 4)
+        x, y, width, height = cursor_pos[0] + 2, cursor_pos[1] - 12, mouse_txt.get_width() + 4, mouse_txt.get_height() + 2
+        pygame.draw.rect(_pygame_display, "black", (x - 1, y - 1,
+                                                    width + 2, height + 2), 0, 4)
+        pygame.draw.rect(_pygame_display, "white", (x, y,
+                         width, height), 0, 4)
         _pygame_display.blit(mouse_txt, (cursor_pos[0] + 4, cursor_pos[1] - 12))
 
     pygame.display.flip()

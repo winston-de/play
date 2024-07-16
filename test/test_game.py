@@ -1,6 +1,9 @@
 import play.play
 
 cat = play.new_text('=^.^=', font_size=70)
+cat.x = 350
+cat.y = 370
+cat.say("Lorum espum stuff Lorum espum stuff !", 4)
 
 play.screen.width = 849
 play.screen.height = 812
@@ -34,13 +37,14 @@ def win_function():
 def test():
     print("Got it!")
 
+
 @play.when_any_message_received
 def message(name):
     print(name)
 
+
 @play.when_key_pressed("g")
 def toggle(key):
     play.screen.show_grid = not play.screen.show_grid
-
 
 play.start_program()

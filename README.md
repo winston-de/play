@@ -336,7 +336,7 @@ Sprites (images and text) have a few simple commands:
 - **`sprite.remove()`** — Removes a sprite from the screen permanently. Calling sprite commands on a removed sprite won't do anything.
 - **`sprite.start_physics()`** — Turn on physics for a sprite. See the [Physics Commands section](#physics-commands) for details.
 - **`sprite.stop_physics()`** — Turn off physics for a sprite. See the [Physics Commands section](#physics-commands) for details.
-
+- **`sprite.say()`** – Creates a speech bubble with text, and shows for the given amount of time
 
 #### Properties
 
