@@ -27,7 +27,7 @@ class TestScreenMethods(unittest.TestCase):
         self.assertEqual(True, play.screen.show_grid)
 
 
-def test_sprite(sp : play.Sprite, tst : unittest.TestCase):
+def test_sprite(sp : play._SpriteBase, tst : unittest.TestCase):
     """Tests cloning of sprites"""
     sp.turn(90)
     b2 = sp.clone()

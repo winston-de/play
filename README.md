@@ -167,6 +167,14 @@ line = play.new_line(
     )
 ```
 
+```play.new_sprite()```
+```python
+sprite = play.new_sprite(x=-100, y=-100, costume_files=["test_image.jpg", "png_test.png"])
+sprite.next_costume()
+```
+This creates a Sprite with a set of costumes that can be switched between using `sprite.next_costume()` and `sprite.previous_costume()`.
+
+
 This will create a thin line on the screen.
 
 ### `play.new_sound()`
@@ -317,7 +325,7 @@ Note: to use `await play.animate()` and `await play.timer()`, the word `async` m
 
 
 
-## Sprite Commands
+## Sprite and Shape Commands
 
 
 #### Simple commands

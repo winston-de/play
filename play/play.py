@@ -311,7 +311,7 @@ class _MetaGroup(type):
         #   class Button(play.Group):
         #      text = play.new_text('click me')
         for item in cls.__dict__.values():
-            if isinstance(item, Sprite):
+            if isinstance(item, _ShapeBase):
                 yield item
 
     def __getattr__(cls, attr):
@@ -433,7 +433,7 @@ class Group(metaclass=_MetaGroup):
             # items added via class variables, e.g.
             # class Button(play.Group):
             #     text = play.new_text('click me')
-            if isinstance(item, Sprite):
+            if isinstance(item, _ShapeBase):
                 yield item
 
     def sprites(self):
@@ -535,7 +535,7 @@ class _Say:
 _say_queue = {} # Sprite : _Say
 
 
-class Sprite(object):
+class _ShapeBase(object):
     def __init__(self, x=0, y=0, size=100, angle=0, transparency=100):
         self._x = x
         self._y = y
@@ -710,7 +710,7 @@ You might want to look in your code where you're setting transparency and make s
 
     def is_touching(self, sprite_or_point):
         rect = self._secondary_pygame_surface.get_rect()
-        if isinstance(sprite_or_point, Sprite):
+        if isinstance(sprite_or_point, _ShapeBase):
             return _sprite_touching_sprite(sprite_or_point, self)
         else:
             return _point_touching_sprite(sprite_or_point, self)
@@ -871,7 +871,7 @@ def new_image(image_filename=None, x=0, y=0, size=100, angle=0, transparency=100
     return Image(image_filename=image_filename, x=x, y=y, size=size, angle=angle, transparency=transparency)
 
 
-class Image(Sprite):
+class Image(_ShapeBase):
     def __init__(self, image_filename=None, x=0, y=0, size=100, angle=0, transparency=100):
         self._image = image_filename or _os.path.join(_os.path.split(__file__)[0], 'blank_image.png')
         self._x = x
@@ -940,6 +940,54 @@ If the file is in a folder, make sure you add the folder name, too.""") from exc
 
     def clone(self):
         return self.__class__(image_filename=self.image_filename, size=self.size, **self._common_properties())
+
+
+def new_sprite(x=0, y=0, size=100, angle=0, transparency=100, costume_files=None):
+    """Creates a sprite, which allows you to have multiple costumes (images)"""
+    return Sprite(x=x, y=y, size=size, angle=angle, transparency=transparency, costume_files=costume_files)
+
+
+class Sprite(Image):
+    """A Sprite is similar to an image, the only difference being it allows you to set a list of
+    "costumes", and switch between them. Under the hood, changing the costume simply changes the image"""
+    def __init__(self, x=0, y=0, size=100, angle=0, transparency=100, costume_files=None):
+        if costume_files is None:
+            costume_files = [""]
+
+        super().__init__(costume_files[0], x, y, size, angle, transparency)
+
+        self._costume_number = 0
+        self.costume_files = costume_files
+
+    def next_costume(self):
+        """Switches to the next costume. If there are no more costumes left, switches to the first one."""
+        if self.costume_number + 1 >= len(self.costume_files):
+            self.costume_number = 0
+        else:
+            self.costume_number += 1
+
+    def previous_costume(self):
+        """Switches to the previous costume. If there are no more costumes before, switches to the last one."""
+        if self.costume_number < 1:
+            self.costume_number = len(self.costume_files) -1
+        else:
+            self.costume_number -= 1
+
+    @property
+    def costume_number(self):
+        return self._costume_number
+
+    @costume_number.setter
+    def costume_number(self, _costume_number):
+        if _costume_number < 0 or _costume_number >= len(self.costume_files):
+            raise Oops("Invalid costume number, please check that the costume number is "
+                       "less than the total number of costumes and greater than zero.")
+
+        self.image_filename = self.costume_files[_costume_number]
+        self._costume_number = _costume_number
+
+    def clone(self):
+        return self.__class__(size=self.size, costume_files=self.costume_files, **self._common_properties())
 
 
 _SPEED_MULTIPLIER = 10
@@ -1181,7 +1229,7 @@ def new_box(color='black', x=0, y=0, width=100, height=200, border_color='light 
                angle=angle, transparency=transparency)
 
 
-class Box(Sprite):
+class Box(_ShapeBase):
     def __init__(self, color='black', x=0, y=0, width=100, height=200, border_color='light blue', border_width=0,
                  transparency=100, angle=0):
         self._x = x
@@ -1282,7 +1330,7 @@ def new_circle(color='black', x=0, y=0, radius=100, border_color='light blue', b
                   transparency=transparency, angle=angle)
 
 
-class Circle(Sprite):
+class Circle(_ShapeBase):
     def __init__(self, color='black', x=0, y=0, radius=100, border_color='light blue', border_width=0, transparency=100,
                  angle=0):
         self._x = x
@@ -1377,7 +1425,7 @@ def new_line(color='black', x=0, y=0, length=None, angle=None, thickness=1, x1=N
                 transparency=transparency)
 
 
-class Line(Sprite):
+class Line(_ShapeBase):
     def __init__(self, color='black', x=0, y=0, length=None, angle=None, thickness=1, x1=None, y1=None,
                  transparency=100):
         self._x = x
@@ -1526,7 +1574,7 @@ def new_text(words='hi :)', x=0, y=0, font=None, font_size=50, color='black', an
                 transparency=transparency)
 
 
-class Text(Sprite):
+class Text(_ShapeBase):
     def __init__(self, words='hi :)', x=0, y=0, font=None, font_size=50, color='black', angle=0, transparency=100):
         self._words = words
         self._x = x
