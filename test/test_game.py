@@ -3,12 +3,11 @@ import play.play
 cat = play.new_text('=^.^=', font_size=70)
 cat.x = 350
 cat.y = 370
-cat.say("Lorum espum stuff Lorum espum stuff !", 4)
+cat.say_forever("Catch me if you can!")
 
-play.screen.width = 849
-play.screen.height = 812
+play.screen.width = 500
+play.screen.height = 500
 play.screen.title = "Meow!"
-play.screen.show_grid = True
 play.set_backdrop("white")
 
 cat_sound = play.new_sound("meow.mp3")
@@ -31,6 +30,7 @@ def win_function():
     cat.words = 'You won!'
     cat_sound.play()
     play.broadcast_message("hi")
+    cat.say_end()
 
 
 @play.when_messaged_received("hi")

@@ -337,6 +337,8 @@ Sprites (images and text) have a few simple commands:
 - **`sprite.start_physics()`** — Turn on physics for a sprite. See the [Physics Commands section](#physics-commands) for details.
 - **`sprite.stop_physics()`** — Turn off physics for a sprite. See the [Physics Commands section](#physics-commands) for details.
 - **`sprite.say()`** – Creates a speech bubble with text, and shows for the given amount of time
+- **`sprite.say_forever()`** – Creates a speech bubble with text, and shows until another speech bubble is created, or sprite.say_end is called
+- **`sprite.say_end()`** – Hides whatever speech bubble is currently showing, if it exists
 
 #### Properties
 

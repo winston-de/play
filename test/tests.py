@@ -3,6 +3,9 @@ import play
 import sys
 import pygame
 
+from play import Oops
+
+
 class TestScreenMethods(unittest.TestCase):
     def test_title(self):
         t = "Hello!"
@@ -57,6 +60,34 @@ class TestSprites(unittest.TestCase):
         line = play.new_line("black", 30, 30, 10, 30)
         test_sprite(line, self)
 
+class SayTests(unittest.TestCase):
+    def test_line(self):
+        box = play.new_box()
+        txt = "a"*100
+        box.say(txt)
+
+    def test_line_spaces(self):
+        box = play.new_box()
+        txt = "aaaa "*10
+        box.say(txt)
+
+    def test_massive_line(self):
+        box = play.new_box()
+        txt = "a"*256
+        with self.assertRaises(Oops):
+            box.say(txt)
+
+    def test_empty(self):
+        box = play.new_box()
+        box.say("")
+    def test_inf(self):
+        box = play.new_box()
+        box.say_forever("hi")
+        box.say_end()
+
+    def test_end(self):
+        box = play.new_box()
+        box.say_end()
 
 @play.when_program_starts
 def start():

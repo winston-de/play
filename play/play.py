@@ -490,10 +490,44 @@ _say_font = pygame.font.SysFont("arial", 14)
 
 
 class _Say:
-    def __init__(self, words, stop_time):
-        self.words = words
-        self.rendered = _say_font.render(words, True, "black")
-        self.stop_time = stop_time
+    def __init__(self, words: str, seconds: float):
+        self.words = []
+
+        # splits the text into multiple lines so that there isn't one massive text box
+        while len(words) > 18:
+            split_index = words.find(" ", 15)
+
+            # by default, add 1 to the index for the next string to remove the space we are splitting at
+            # if we are not splitting at a space, this will be set to 0
+            index_adder = 1
+            if split_index == -1 or split_index > 24:
+                # unable to find a space nearby, so just split the string here
+                split_index = 18
+                # we don't need to remove a character if we aren't splitting at a space
+                index_adder = 0
+
+            if split_index + index_adder < len(words):  # ensure we are within the length of the string
+                self.words.append(words[:split_index])
+                words = words[split_index+index_adder:]
+
+        self.words.append(words)
+
+        self.rendered = []
+        self.height = 0
+        self.max_width = 0
+        self.max_height = 0
+
+        # render all the lines, and get the max width to use for drawing the text box
+        for w in self.words:
+            r = _say_font.render(w, True, "black")
+            self.rendered.append(r)
+            h = r.get_height()
+            self.height += h  # we will need the total height to know how big to draw the speech bubble
+            self.max_height = max(h, self.max_height)
+            # we need the max width to know how wide to make the speech bubble
+            self.max_width = max(r.get_width(), self.max_width)
+
+        self.stop_time = time.time() + seconds if seconds != -1 else -1
 
 
 # we store speech bubbles like this instead of within the Sprite class in order to keep the _Say instance internal to
@@ -564,8 +598,28 @@ class Sprite(object):
     def turn(self, degrees=10):
         self.angle += degrees
 
-    def say(self, words, seconds=3):
-        _say_queue[self] = _Say(words, time.time() + seconds)
+    def say(self, words: str, seconds: float = 3):
+        """Creates a speech bubble next to the sprite, containing the given words. Will disappear
+        after the given amount of seconds, 3 by default. Max length of 255 characters."""
+
+        # if the string is empty, then don't say anything, and clear anything currently being said
+        if words == "" and self in _say_queue:
+            # stop speaking
+            _say_queue.pop(self)
+
+        if len(words) >= 255:
+            raise Oops("It looks like you're trying to say too much here, please reduce the length of your message")
+        _say_queue[self] = _Say(words, seconds)
+
+    def say_forever(self, words):
+        """Creates a permanent speech bubble, can be hidden by calling say_end.
+        Max length of 255 characters"""
+        self.say(words, -1)
+
+    def say_end(self):
+        """If anything is being said, stop saying it"""
+        if self in _say_queue:
+            _say_queue.pop(self)
 
     @property
     def x(self):
@@ -1937,39 +1991,60 @@ def _game_loop():
         else:
             _pygame_display.blit(sprite._secondary_pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
 
-        # draw speech bubbles
-        sq = _say_queue.get(sprite)
-        if sq is not None:
-            if time.time() >= sq.stop_time:
+        # draw speech bubbles, if needed
+        say_obj: _Say = _say_queue.get(sprite)
+        if say_obj is not None:
+            # if stop_time is -1, then we are showing the bubble indefinitely
+            if say_obj.stop_time != -1 and time.time() >= say_obj.stop_time:
+                # have reached the amount of time the bubble is meant to be shown, so delete it
                 _say_queue.pop(sprite)
             else:
-                ren = sq.rendered
-                x = sprite.right + screen.width / 2 + 5
-                y = screen.height / 2 - sprite.top - 10
+                rendered_lines = say_obj.rendered
+                # convert to pygame coordinates
+                x = sprite.right + screen.width / 2 + 15
+                y = screen.height / 2 - sprite.top - say_obj.height * 0.75
 
-                # if the sprite is displaying above the top of the screen, move it to the bottom
-                if y < 10:
+                # if the sprite is displaying close to or above the top of the screen, move it to the bottom
+                if y < 5:
                     y += sprite.height + 20
 
-                if x > _pygame_display.get_width() - 10:
-                    x -= sprite.width + 10 + ren.get_width()
+                # if the right side of the text box is displaying close to or beyond the screen width,
+                # move it to the left side of the sprite
+                if x + say_obj.max_width > _pygame_display.get_width() - 5:
+                    x -= sprite.width + 10 + say_obj.max_width
 
+                # shows the text bubble background itself
                 pygame.draw.rect(_pygame_display, (12, 12, 12),
-                                 (x - 6, y - 6, ren.get_width() + 7, ren.get_height() + 7), border_radius=2)
-                pygame.draw.rect(_pygame_display, (255, 255, 255), (x-5, y-5, ren.get_width() + 5,
-                                                                    ren.get_height() + 5), border_radius=2)
-                _pygame_display.blit(ren, (x-2, y-2))
+                                 (x - 6, y - 6, say_obj.max_width + 7, say_obj.height + 7), border_radius=2) # black border
+                pygame.draw.rect(_pygame_display, (255, 255, 255), (x - 5, y - 5, say_obj.max_width + 5,
+                                                                    say_obj.height + 5), border_radius=2) # white background
 
+                # blit each line of text on top of the bubble
+                i = 0
+                for line in rendered_lines:
+                    _pygame_display.blit(line, (x-2, y-2 + say_obj.max_height * i))
+                    i += 1
 
     if screen.show_grid:
         # draw coordinates next to mouse cursor
         cursor_pos = pygame.mouse.get_pos()
-        mouse_txt = _grid_font.render(f"({cursor_pos[0] - screen.width // 2}, {-1*(cursor_pos[1] - screen.height // 2)})", True, "black")
-        x, y, width, height = cursor_pos[0] + 2, cursor_pos[1] - 12, mouse_txt.get_width() + 4, mouse_txt.get_height() + 2
+        mouse_txt = _grid_font.render(f"({cursor_pos[0] - screen.width // 2}, "
+                                      f"{-1*(cursor_pos[1] - screen.height // 2)})", True, "black")
+
+
+        # get the x and y, then calculate the width and height of the bubble background
+        x, y, width, height = (cursor_pos[0] + 2, cursor_pos[1] - 12,
+                               mouse_txt.get_width() + 4, mouse_txt.get_height() + 2)
+
+        # black background to create outline behind text box
         pygame.draw.rect(_pygame_display, "black", (x - 1, y - 1,
                                                     width + 2, height + 2), 0, 4)
+
+        # white bubble background
         pygame.draw.rect(_pygame_display, "white", (x, y,
                          width, height), 0, 4)
+
+        # finally, draws the text on top of the bubble
         _pygame_display.blit(mouse_txt, (cursor_pos[0] + 4, cursor_pos[1] - 12))
 
     pygame.display.flip()

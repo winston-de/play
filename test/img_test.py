@@ -12,6 +12,7 @@ img3 = img2.clone()
 img3.x = 150
 img3.y = 150
 
+# img.say("Hello!Hello!Hello!Hello!Hello!Hello!Hello !Hello!Hello!Hello!Hello!Hello!Hello!Hello!")
 # circle = play.new_circle()
 # c2 = circle.clone()
 
